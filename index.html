@@ -1,0 +1,546 @@
+<!DOCTYPE html-->
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+<title>Examen</title>
+            
+            <style type="text/css">
+                h1{
+                    text-align: center;
+                }
+                p{
+                    text-align: center;
+                }
+            </style>
+            <script type="text/javascript">
+                $(document).ready(function inicio(){
+                    
+                var btnEnvio_venta=$("#enviar_venta");                
+                btnEnvio_venta.click(function enviarventas(){
+                    
+                    var Idpan=$("#Idpan").val();
+                   var piev=$("#piev").val();
+                    var fec=$("#fec").val();
+                      var nomp=$("#nomp").val();
+                    var preu=parseInt($("#preu").val());
+                    var pre=parseInt($("#pre").val());
+                    
+                    $.ajax({
+                        type:"POST",
+                        url:"http//localhostvalery.260mb.net/gardarDatosVentas.php",
+    data:"Id_Pan="+Idpan+"&Piezas_Vendidas="+piev+"&Fecha="+fec+"&Nombre_Pan="+nomp+"&Precio_Unitario="+preu+"&Precio_Total="+pre,
+    success: recepcion
+                        });
+                    });
+                
+                var btnEnvio_ingredientes=$("#enviar_ingredientes");
+                btnEnvio_ingredientes.click(function enviarDatos(){
+              var nom=$("#nom").val();
+  var cant=$("#cant").val();
+  var prev=parseInt($("#prev").val());
+  var fecha=$("#fecha").val();
+   var prov=$("#prov").val();
+    $.ajax({
+    type:"POST",
+    url:"http//localhostvalery.260mb.net/gardarDatosIngre.php",
+    data:"Nombre="+nom+"&Cantidad="+cant+"&Precio="+prev+"&Fecha_Caducidad="+fecha+"&Proveedor="+prov,
+    success: recepcion
+                        });
+                    });
+                function recepcion(datos){
+                    alert(datos);
+                    }
+                    
+                    var btnCon_Ventas = $("#btnCon_Ventas");
+                    btnCon_Ventas.click(function conVentas(){
+                        $.ajax({
+                            type:"POST",
+                            url:"http//localhostvalery.260mb.net/consultar_Ventas.php",
+                            data:"",
+                            success: consultar_Ventas
+                        });
+                        function consultar_Ventas(datos) {
+                            var ventas=$.parseJSON(datos);
+                            var respuesta=$("#resCon_Ventas");
+                            Tabla_Ventas(respuesta, ventas);
+                            }
+                    });
+                    function Tabla_Ventas(respuesta, ventas) {
+                        respuesta.html("");
+                        respuesta.append('<table id="tab" border="1">');
+                        
+                        var tabla=$("#tab");
+                        tabla.html("<tr><th>ID</th><th>Piezas Vendidas</th><th>Fecha</th><th>Pan</th><th>Precio Unitario</th><th>Total</th></tr>");
+                        for(var i in ventas){
+                            tabla.append("<tr><td>"+ventas[i].Id_Pan+"</td>"
+                                         +"<td>"+ventas[i].Piezas_Vendidas+"</td>"
+                                         +"<td>"+ventas[i].Fecha+"</td>"
+                                         +"<td>"+ventas[i].Nombre_Pan+"</td>"
+                                         +"<td>"+ventas[i].Precio_Unitario+"</td>"
+                                         +"<td>"+ventas[i].Precio_Total+"</td></tr>");
+                            }
+                            tabla.append("</table>");
+                            }
+                            var btnCon_ingredientes = $("#btnCon_ingredientes");
+                            btnCon_ingredientes.click(function conIngredientes(){
+                                $.ajax({
+                                    type:"POST",
+                                    url:"http//localhostvalery.260mb.net/consultar_Ingredientes.php",
+                                    data:"",
+                                    success: consultar_Ingre
+                                });
+                                function consultar_Ingre(datos){
+                                    var ingrediente=$.parseJSON(datos);
+                                    var respuesta=$("#resCon_ingredientes");
+                                    Tabla_Ingredientes(respuesta, ingrediente);
+                                }
+                            });
+                            function Tabla_Ingredientes(respuesta, ingrediente) {
+                                respuesta.html("");
+                                respuesta.append('<table id="tab" border="1">');
+                                
+                                var tabla=$("#tab");
+                                tabla.html("<tr><th>ID</th><th>Nombre</th><th>Cantidad</th><th>Precio</th><th>Fecha</th><th>Proveedor</th></tr>");
+                                for(var i in ingrediente){
+                                    tabla.append("<tr><td>"+ingrediente[i].Id_Pan+"</td>"
+                                                 +"<td>"+ingrediente[i].Nombre+"</td>"
+                                                 +"<td>"+ingrediente[i].Cantidad+"</td>"
+                                                 +"<td>"+ingrediente[i].Precio+"</td>"
+                                                 +"<td>"+ingrediente[i].Fecha_Caducidad+"</td>"
+                                                 +"<td>"+ingrediente[i].Proveedor+"</td></tr>");
+                                    }
+                                    tabla.append("</table>");
+                                    }
+
+                                    var dat_Eliminar =$("#dat_Eliminar");
+                                    dat_Eliminar.click(function mostrar_Ventas(){
+                                        $.ajax({
+                                            type:"POST",
+                                            url:"http//localhostvalery.260mb.net/consultar_Ventas.php",
+                                            data:"",
+                                            success: todas_Ventas
+                                            });
+                                        function todas_Ventas(datos) {
+                                            var ventas=$.parseJSON(datos);
+                                            var respuesta=$("#todo_Ventas");
+                                            Tabla_Ventas(respuesta, ventas);
+                                            }
+                                    });
+                                    
+            var btnEliminar_venta = $("#btnEliminar_venta");
+            btnEliminar_venta.click(function eliminar_venta(){
+                var id = $("#id_Eliminar").val();
+                if (id=="") {
+                    alert("Ingrese un ID para eliminar");
+                }else{
+                $.ajax({
+                    type:"POST",
+                    url:"http//localhostvalery.260mb.net/eliminar_Ventas.php",
+                    data:"ID="+id,
+                    success: eliminar_Venta
+                });
+                }
+                function eliminar_Venta(datos) {
+                    alert(datos);
+                }
+            });
+            var dat_Ingre = $("#dat_Ingre");
+            dat_Ingre.click(function datos_Ingredientes(){
+                $.ajax({
+                    type:"POST",
+                    url:"http//localhostvalery.260mb.net/consultar_Ingredientes.php",
+                    data:"",
+                    success: mostrar_Ingre
+                    });
+                function mostrar_Ingre(datos){
+                    var ingrediente=$.parseJSON(datos);
+                    var respuesta=$("#todo_Ingredientes");
+                    Tabla_Ingredientes(respuesta, ingrediente);
+                    }
+            });
+            var btnEliminar_Ingrediente = $("#btnEliminar_Ingrediente");
+            btnEliminar_Ingrediente.click(function eliminar_Ingredientes(){
+                var id = $("#id_Ingrediente").val();
+                if (id=="") {
+                    alert("Ingrese un ID para eliminar");
+                }else{
+                $.ajax({
+                    type:"POST",
+                    url:"http//localhostvalery.260mb.net/eliminar_Ingredientes.php",
+                    data:"ID="+id,
+                    success: elim_Ingredientes
+                });
+                }
+                function elim_Ingredientes(datos) {
+                    alert(datos);
+                }
+            });
+            
+            
+            //codigo actualizar ventas
+            var datos_Ventas = $("#datos_Ventas");
+            datos_Ventas.click(function act_Ventas(){
+                $.ajax({
+                    type:"POST",
+                    url:"http//localhostvalery.260mb.net/consultar_Ventas.php",
+                    data:"",
+                    success: con_Ventas
+                    });
+                function con_Ventas(datos) {
+                    var ventas=$.parseJSON(datos);
+                    var respuesta=$("#reg_Ventas");
+                    Tabla_Ventas(respuesta, ventas);
+                    }
+            });
+            var car_Venta = $("#car_Venta");
+            car_Venta.click(function dat_ActVenta(){
+                var id = $("#act_Venta").val();
+                if (id=="") {
+                    alert("Ingrese un ID");
+                }else{
+                $.ajax({
+                    type:"POST",
+                    url:"http//localhostvalery.260mb.net/con_unaVenta.php",
+                    data:"ID="+id,
+                    success: actu_Venta
+                });
+                }
+                function actu_Venta(datos) {
+                    var ventas=$.parseJSON(datos);
+                    var respCargDatos=$("#datAct_Venta");
+                    
+                    respCargDatos.html("<label>ID:</label><input type='text' id='Id' disabled='yes'>");
+                    respCargDatos.append("<label>Piezas Venidas:</label><input type='text' id='pzas'>");
+                    respCargDatos.append("<label>Fecha:</label><input type='text' id='fech'>");
+                    respCargDatos.append("<label>Pan:</label><input type='text' id='pann'>");
+                    respCargDatos.append("<label>Precio unitario:</label><input type='text' id='preun'>");
+                    respCargDatos.append("<label>Total:</label><input type='text' id='tota'>");
+                    
+                    var Id=$("#Id");
+                    var pzas=$("#pzas");
+                    var fech=$("#fech");
+                    var pann=$("#pann");
+                    var preun=$("#preun");
+                    var tota=$("#tota");
+                    
+                    for(var i in ventas){
+                        Id.val(ventas[i].Id_Pan);
+                        pzas.val(ventas[i].Piezas_Vendidas);
+                        fech.val(ventas[i].Fecha);
+                        pann.val(ventas[i].Nombre_Pan);
+                        preun.val(ventas[i].Precio_Unitario);
+                        tota.val(ventas[i].Precio_Total);
+                        }
+                        }
+            });
+            
+            var btnAct_Venta = $("#btnAct_Venta");
+            btnAct_Venta.click(function reg_DatAcVentas(){
+                
+                var id=parseInt($("#Id").val());
+                var pzs=$("#pzas").val();
+                var fec=$("#fech").val();
+                var pan=$("#pann").val();
+                var preu=$("#preun").val();
+                var tot=$("#tota").val();
+                
+                if (id=="" || pzs=="" || fec=="" || pan=="" || preu=="" || tot=="") {
+                    alert("Ingresar datos en todos los campos");
+                }
+                else{
+                    $.ajax({
+                        type:"POST",
+                        url:"http//localhostvalery.260mb.net/actualizar_Ventas.php",
+                        data:"ID="+id+"&Piezas="+pzs+"&Fecha="+fec+"&Pan="+pan+"&Precio="+preu+"&Total="+tot,
+                        success: act_Venta
+                    });
+                }
+                function act_Venta(datos) {
+                    alert(datos);
+                }
+            });
+            
+            //codigo actualizar ingredentes
+            
+            var datos_actingre = $("#datos_actingre");
+            datos_actingre.click(function mosToIngredientes(){
+                $.ajax({
+                                    type:"POST",
+                                    url:"http//localhostvalery.260mb.net/consultar_Ingredientes.php",
+                                    data:"",
+                                    success: reg_ActuIngre
+                                });
+                                function reg_ActuIngre(datos){
+                                    var ingrediente=$.parseJSON(datos);
+                                    var respuesta=$("#reg_datingredientes");
+                                    Tabla_Ingredientes(respuesta, ingrediente);
+                                }
+            });
+            
+            var car_ingredientes = $("#car_ingredientes");
+            car_ingredientes.click(function carDatIngre(){
+                var id = $("#idact_ingredientes").val();
+                if (id=="") {
+                    alert("Ingrese un ID");
+                }else{
+                    $.ajax({
+                    type:"POST",
+                    url:"http//localhostvalery.260mb.net/con_unaIngre.php",
+                    data:"ID="+id,
+                    success: actu_Ingre
+                });
+                }
+                function actu_Ingre(datos) {
+                    var ingrediente=$.parseJSON(datos);
+                    var respCargDatos=$("#datAct_ingre");
+                    
+                    respCargDatos.html("<label>ID:</label><input type='text' id='Id' disabled='yes'>");
+                    respCargDatos.append("<label>Nombre:</label><input type='text' id='noom'>");
+                    respCargDatos.append("<label>Cantidad:</label><input type='text' id='caan'>");
+                    respCargDatos.append("<label>Precio:</label><input type='text' id='prre'>");
+                    respCargDatos.append("<label>Fecha:</label><input type='text' id='feec'>");
+                    respCargDatos.append("<label>Proveedor:</label><input type='text' id='prro'>");
+                    
+                    var Id=$("#Id");
+                    var noom=$("#noom");
+                    var caan=$("#caan");
+                    var prre=$("#prre");
+                    var feec=$("#feec");
+                    var prro=$("#prro");
+                    
+                    for(var i in ingrediente){
+                        Id.val(ingrediente[i].Id_Pan);
+                        noom.val(ingrediente[i].Nombre);
+                        caan.val(ingrediente[i].Cantidad);
+                        prre.val(ingrediente[i].Precio);
+                        feec.val(ingrediente[i].Fecha_Caducidad);
+                        prro.val(ingrediente[i].Proveedor);
+                        }
+                }
+            });
+            var Gua_ActIngre = $("#Gua_ActIngre");
+            Gua_ActIngre.click(function guar_ActIngredi(){
+                var id=parseInt($("#Id").val());
+                var noom=$("#noom").val();
+                var caan=$("#caan").val();
+                var prre=$("#prre").val();
+                var feec=$("#feec").val();
+                var prro=$("#prro").val();
+                
+                if (noom=="" || caan=="" || prre=="" || feec=="" || prro=="") {
+                    alert("Ingresar datos en todos los campos");
+                }
+                else{
+                    $.ajax({
+                        type:"POST",
+                        url:"http//localhostvalery.260mb.net/actualizar_Ingredientes.php",
+                        data:"ID="+id+"&Nombre="+noom+"&Cantidad="+caan+"&Precio="+prre+"&Fecha="+feec+"&Proveedor="+prro,
+                        success: act_Ingredien
+                    });
+                }
+                function act_Ingredien(datos) {
+                    alert(datos);
+                }
+            });
+});
+            </script>
+        </head>
+        <body>
+           
+            <div data-role="page" id="Principal" data-theme="a">
+                <div data-role="header" id="en_principal">
+                    <p>Panaderia<p/>
+                </div>
+                <div >
+                    <p>Ventas</p>
+                    <a href="#Reg_ventas" data-role="button" data-transition="fade" id="menus2">Registrar Ventas</a>
+                    <a href="#Con_ventas" data-role="button" data-transition="fade" id="menus2">Consultar Ventas</a>
+                    <a href="#Eli_ventas" data-role="button" data-transition="fade" id="menus2">Eliminar Ventas</a>
+                    <a href="#Act_ventas" data-role="button" data-transition="fade" id="menus2">Actualizar Ventas</a>
+                    <p>Ingredientes</p>
+                    <a href="#Reg_ingredientes" data-role="button" data-transition="fade" id="menus1">Registrar Ingrediente</a>
+                    <a href="#Con_ingredientes" data-role="button" data-transition="fade" id="menus1">Consultar Ingrediente</a>
+                    <a href="#Eli_ingredientes" data-role="button" data-transition="fade" id="menus1">Eliminar Ingrediente</a>
+                    <a href="#Act_ingredientes" data-role="button" data-transition="fade" id="menus1">Actualizar Ingrediente</a>
+                </div>
+                <div data-role="footer" id="pieprincipal">
+                    <p>Pie de página</p>
+                </div>
+            </div>
+            
+            <div data-role="page" id="Reg_ventas" data-theme="a">
+                <div data-role="header">
+                    <a href="#Principal" data-role="button" data-transition="pop" data-add-back-btn="true" data-icon="star">Inicio</a>
+                    <p> Datos Ventas</p>
+                </div>
+                <div data-role="content">
+                    
+                    <form method="POST" action="gardardatosIngre.php">
+                        <div class="ui-field-contain">
+                          
+                            <label for="piev">Piezas Vendidas: </label>
+                            <input type="text" name="piev" id="piev">
+                
+                            <label for="fec">Fecha: </label>
+                            <input type="date" name="fec" id="fec">
+                
+                            <label for="nomp">Nombre Pan: </label>
+                            <input type="text" name="nomp" id="nomp">
+                
+                            <label for="preu">Precio Unitario: </label>
+                            <input type="text" name="preu" id="preu">
+                
+                            <label for="pre">Precio Total: </label>
+                            <input type="text" name="pre" id="pre">
+                            
+                        </div>
+                        
+                          <input type="button" name="enviar_ventas" id="enviar_venta" value="Enviar">
+                     </form>
+                    <div id="respuesta"> </div>
+                </div>
+                <div data-roler="footer">
+                    <p>Derechos reservados</p>
+                </div>
+            </div>
+            
+            <div data-role="page" id="Reg_ingredientes" data-theme="a">
+                <div data-role="header">
+                    <a href="#Principal" data-role="button" data-transition="flip" data-add-back-btn="true" data-icon="star">Inicio</a>
+                    <p>ingredientes</p>
+                </div>
+                
+                <div data-role="content">
+                    
+                    <form method="POST" action="gardarDatosIngre.php">
+                        <div class="ui-field-contain">
+                             <label for="nom">Nombre: </label>
+	                     <input type="text" name="nom" id="nom" >
+	                    <label for="cant">Cantida: </label>
+	                  <input type="text" name="cant" id="cant" >
+	                <label for="prev">Precio: </label>
+	               <input type="text" name="prev" id="prev" >
+	              <label for="fecha">Fecha Caducidad: </label>
+	              <input type="date" name="fecha" id="fecha" >	  
+	             <label for="prov">Proveedor: </label>
+	             <input type="text" name="prov" id="prov"  >
+                                                   
+                             </div>
+                        <input type="button" name="enviar_ingredentes" id="enviar_ingredientes" value="Enviar">
+                    </form>
+                    <div id="respuesta1"> </div>
+                </div>
+                <div data-roler="footer" id="cali">
+                    <p>Derechos reservados</p>
+                </div>
+            </div>
+            
+            <div data-role="page" id="Con_ventas">
+                <div data-role="header">
+                    <a href="#Principal" data-role="button" data-transition="flip" data-add-back-btn="true" data-icon="star">Inicio</a>
+                    <p>Consulta de ventas</p>
+                </div>
+                <div data-role="content">
+                    <input type="button" id="btnCon_Ventas" value="Consultar">
+                    <div id="resCon_Ventas"></div>
+                </div>
+                <div data-role="footer">
+                    <p>Derechos reservados</p>
+                </div>
+            </div>
+            
+            <div data-role="page" id="Con_ingredientes">
+                <div data-role="header">
+                    <a href="#Principal" data-role="button" data-transition="flip" data-add-back-btn="true" data-icon="star">Inicio</a>
+                    <p>CONSULTAR INGREDIENTES</p>
+                </div>
+                <div data-role="content">
+                    <input type="button" id="btnCon_ingredientes" value="Consultar">
+                    <div id="resCon_ingredientes"></div>
+                </div>
+                <div data-role="footer">
+                    <p>Derechos reservados</p>
+                </div>
+            </div>
+            
+            <div data-role="page" id="Eli_ventas">
+                <div data-role="header">
+                    <a href="#Principal" data-role="button" data-transition="flip" data-add-back-btn="true" data-icon="star">Inicio</a>
+                    <p>ELIMINAR VENTAS</p>
+                </div>
+                <div data-role="content">
+                    <input type="button" id="dat_Eliminar" value="Mostrar todos los registros">
+                    <div id="todo_Ventas"></div>
+                    <label for="id_Eliminar">ID a Eliminar:</label>
+                    <input type="text" id="id_Eliminar">
+                    <input type="button" id="btnEliminar_venta" value="Eliminar">
+                </div>
+                <div data-role="footer">
+                    <p>Derechos reservados</p>
+                </div>
+            </div>
+            
+            <div data-role="page" id="Eli_ingredientes">
+                <div data-role="header">
+                    <a href="#Principal" data-role="button" data-transition="flip" data-add-back-btn="true" data-icon="star">Inicio</a>
+                    <p>ELIMINAR INGRESIENTES</p>
+                </div>
+                <div data-role="content">
+                    <input type="button" id="dat_Ingre" value="Mostrar todos los registros">
+                    <div id="todo_Ingredientes"></div>
+                    
+                    <label for="id_Ingrediente">ID a Eliminar:</label>
+                    <input type="text" id="id_Ingrediente">
+                    <input type="button" id="btnEliminar_Ingrediente" value="Eliminar">
+                </div>
+                <div data-role="footer">
+                    <p>Derechos reservados</p>
+                </div>
+            </div>
+            
+            <div data-role="page" id="Act_ventas">
+                <div data-role="header">
+                    <a href="#Principal" data-role="button" data-transition="flip" data-add-back-btn="true" data-icon="star">Inicio</a>
+                    <p>ACTUALIZAR VENTAS</p>
+                </div>
+                <div data-role="content">
+                    <input type="button" id="datos_Ventas" value="Mostrar todas las ventas">
+                    <div id="reg_Ventas"></div>
+                    <label for="act_Venta">ID a Actualizar:</label>
+                    <input type="text" id="act_Venta">
+                    <div id="datAct_Venta"></div>
+                    <input type="button" id="car_Venta" value="Cargar datos">
+                    <input type="button" id="btnAct_Venta" value="Actualizar">
+                </div>
+                <div data-role="footer">
+                    <p>Derechos reservados</p>
+                </div>
+            </div>
+            
+            <div data-role="page" id="Act_ingredientes">
+                <div data-role="header">
+                    <a href="#Principal" data-role="button" data-transition="flip" data-add-back-btn="true" data-icon="star">Inicio</a>
+                    <p>ACTUALIZAR INGREDIENTES</p>
+                </div>
+                <div data-role="content">
+                    <input type="button" id="datos_actingre" value="Mostrar todas las ingredientes">
+                    <div id="reg_datingredientes"></div>
+                    <label for="idact_ingredientes">ID a Actualizar:</label>
+                    <input type="text" id="idact_ingredientes">
+                    <div id="datAct_ingre"></div>
+                    
+                    <input type="button" id="car_ingredientes" value="Cargar datos">
+                        
+                    <input type="button" id="Gua_ActIngre" value="Actualizar">
+                    
+                </div>
+                <div data-role="footer">
+                    <p>Derechos reservados</p>
+                </div>
+            </div>
+            
+        </body>
+    </html>
